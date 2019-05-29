@@ -1,6 +1,0 @@
-﻿  main.cpp
-c:\users\dell\source\repos\mạng máy tính\mmtwinsock\mmtwinsock\main.cpp(130): warning C4018: '<': signed/unsigned mismatch
-c:\users\dell\source\repos\mạng máy tính\mmtwinsock\mmtwinsock\main.cpp(156): warning C4018: '<': signed/unsigned mismatch
-c:\users\dell\source\repos\mạng máy tính\mmtwinsock\mmtwinsock\main.cpp(184): warning C4018: '<': signed/unsigned mismatch
-c:\users\dell\source\repos\mạng máy tính\mmtwinsock\mmtwinsock\main.cpp(209): warning C4018: '<': signed/unsigned mismatch
-  MMTWinsock.vcxproj -> C:\Users\Dell\source\repos\MẠNG MÁY TÍNH\MMTWinsock\Debug\MMTWinsock.exe

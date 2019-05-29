@@ -1,0 +1,8 @@
+﻿  main.cpp
+d:\mạng máy tính\đồ án 1\1712826_1712866_1712884_1712885\src\1712826_1712866_1712884_1712885\main.cpp(55): warning C4018: '>=': signed/unsigned mismatch
+d:\mạng máy tính\đồ án 1\1712826_1712866_1712884_1712885\src\1712826_1712866_1712884_1712885\main.cpp(77): warning C4018: '>=': signed/unsigned mismatch
+d:\mạng máy tính\đồ án 1\1712826_1712866_1712884_1712885\src\1712826_1712866_1712884_1712885\main.cpp(134): warning C4018: '<': signed/unsigned mismatch
+d:\mạng máy tính\đồ án 1\1712826_1712866_1712884_1712885\src\1712826_1712866_1712884_1712885\main.cpp(160): warning C4018: '<': signed/unsigned mismatch
+d:\mạng máy tính\đồ án 1\1712826_1712866_1712884_1712885\src\1712826_1712866_1712884_1712885\main.cpp(188): warning C4018: '<': signed/unsigned mismatch
+d:\mạng máy tính\đồ án 1\1712826_1712866_1712884_1712885\src\1712826_1712866_1712884_1712885\main.cpp(213): warning C4018: '<': signed/unsigned mismatch
+  1712826_1712866_1712884_1712885.vcxproj -> D:\MẠNG MÁY TÍNH\ĐỒ ÁN 1\1712826_1712866_1712884_1712885\src\Debug\1712826_1712866_1712884_1712885.exe
