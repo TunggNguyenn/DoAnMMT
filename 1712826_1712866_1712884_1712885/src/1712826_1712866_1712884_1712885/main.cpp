@@ -247,10 +247,21 @@ string ConvertStr(char* URL, int lenURL)
 }
 
 //Hàm kiểm tra URL đã được caching chưa
-bool CheckURLinList(char* URL, int lenURL)
+bool CheckURLinList(char* &URL, int &lenURL)
 {
 	ifstream URLList;
 	string str;
+
+	if (lenURL > 96)
+	{
+		char* URL_new = (char*)malloc(97);
+		strncpy(URL_new, URL + (lenURL - 96), 96);
+
+		URL_new[96] = '\0';
+		lenURL = 96;
+		URL = URL_new;
+	}
+
 	string URL_string = ConvertStr(URL, lenURL);
 
 	URLList.open("WebCache\\\\URLList.txt", ios::in);
@@ -276,11 +287,14 @@ bool CheckURLinList(char* URL, int lenURL)
 //Tạo tên cho tập tin từ URL
 char* CreateFileName(char* &URL, int &lenURL)
 {
-	if (lenURL > 181)
+	if (lenURL > 96)
 	{
-		URL = (char*)realloc(URL, 181);
-		URL[180] = '\0';
-		lenURL = 180;
+		char* URL_new = (char*)malloc(97);
+		strncpy(URL_new, URL + (lenURL - 96), 96);
+
+		URL_new[96] = '\0';
+		lenURL = 96;
+		URL = URL_new;
 	}
 
 	int len = lenURL + 10 + 4 + 1;
@@ -554,7 +568,14 @@ DWORD WINAPI Exe(LPVOID lpParam)
 	}
 
 	//Lấy URL từ headerRequest
-	URL = GetStr(headerRequest, (char*)"GET http://", ' ');
+	if (Method == 0)
+	{
+		URL = GetStr(headerRequest, (char*)"GET http://", ' ');
+	}
+	else if (Method == 1)
+	{
+		URL = GetStr(headerRequest, (char*)"POST http://", ' ');
+	}
 	int lenURL = strlen(URL);
 
 	/*Kiểm tra If-modifier-Since nếu có*/
@@ -563,9 +584,9 @@ DWORD WINAPI Exe(LPVOID lpParam)
 	/*Kiểm tra URL này đã được caching chưa*/
 	checkURL = CheckURLinList(URL, lenURL);
 
-	if (checkURL == false || (checkURL == true && checkModified == true))		//Chưa được caching
+	if (checkURL == false || (checkURL == true && checkModified == true) || Method == 1)		//Chưa được caching
 	{
-		if (checkURL == false)
+		if (checkURL == false || Method == 1)
 		{
 			Delete_Modified(headerRequest);
 			szHeaderRequest = strlen(headerRequest);
@@ -598,7 +619,7 @@ DWORD WINAPI Exe(LPVOID lpParam)
 			}
 
 			closesocket(Server);	//Đóng socket của Server
-			closesocket(Browser);	//Đóng sockett của Browser
+			closesocket(Browser);	//Đóng socket của Browser
 			ExitThread(0);
 		}
 		else
@@ -661,6 +682,7 @@ DWORD WINAPI Exe(LPVOID lpParam)
 
 			send(Browser, headerResponse, sizeResponse, 0);
 
+
 			///////////////////////////////////////////////////////////////////////////////////
 			/*Lấy Cache đưa lên Browser*/
 			bool NotFound = FindSubStr(headerResponse, (char*)"304 Not Modified");
@@ -718,17 +740,18 @@ DWORD WINAPI Exe(LPVOID lpParam)
 
 			char* StatusLine = GetStr(headerResponse, (char*)"HTTP/1.", '\r');
 			bool Check200OK = FindSubStr(StatusLine, (char*)"200 OK");
-			char* URL_fileName = URL_fileName = CreateFileName(URL, lenURL);		//Tạo tên cho tập tin dựa vào URL
+			char* URL_fileName = CreateFileName(URL, lenURL);		//Tạo tên cho tập tin dựa vào URL
 
 			////////////////////////////////////////////////////////////
-			if (checkURL == true)
+			if (checkURL == true && Method == 0)
 			{
 				FILE *CachingFile;
 				CachingFile = fopen(URL_fileName, "wb");
+
 			}
 			////////////////////////////////////////////////////////////
 
-			if (Check200OK == true)
+			if (Check200OK == true && checkURL == false && Method == 0)
 			{
 				WriteCachingFile(URL_fileName, headerResponse, sizeResponse);			//Mở file để caching headerResponse
 
@@ -739,6 +762,8 @@ DWORD WINAPI Exe(LPVOID lpParam)
 				URLList << URL << endl;
 				URLList.close();
 			}
+
+			checkURL = false;	//Thêm vô
 
 			char HTMLResponse[513] = { 0 };
 			do
@@ -757,7 +782,7 @@ DWORD WINAPI Exe(LPVOID lpParam)
 					cout << HTMLResponse;
 					send(Browser, HTMLResponse, iResult, 0);
 
-					if (Check200OK == true && checkURL == false)
+					if (Check200OK == true && checkURL == false && Method == 0)
 					{
 						WriteCachingFile(URL_fileName, HTMLResponse, iResult);			//Mở file để caching headerResponse
 					}
@@ -767,7 +792,7 @@ DWORD WINAPI Exe(LPVOID lpParam)
 				HTMLResponse[iResult] = '\0';	//Ngắt chuỗi nếu RESPONSE nhận < 512 BYTES hoặc cuối cùng để in chuỗi
 				cout << HTMLResponse;
 				send(Browser, HTMLResponse, iResult, 0);
-				if (Check200OK == true)
+				if (Check200OK == true && checkURL == false && Method == 0)
 				{
 					WriteCachingFile(URL_fileName, HTMLResponse, iResult);			//Mở file để caching headerResponse
 				}
@@ -789,7 +814,7 @@ DWORD WINAPI Exe(LPVOID lpParam)
 		}
 		closesocket(Server);
 	}
-	else if (checkModified == false && checkURL == true)
+	else if (checkModified == false && checkURL == true && Method == 0)
 	{
 		char* URL_fileName = CreateFileName(URL, lenURL);		//Tạo tên cho tập tin dựa vào URL
 		FILE *CachingFile;
